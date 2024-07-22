@@ -6,11 +6,13 @@
 //
 
 import SwiftUI
+import Foundation
+
 
 @main
 struct MovelahApp: App {
     let persistenceController = PersistenceController.shared
-
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
