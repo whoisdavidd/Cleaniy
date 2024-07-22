@@ -144,6 +144,21 @@ struct ContentView: View {
             }
         }
     }
+    func requestNotificationPermission() {
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("Error requesting notification permission: \(error.localizedDescription)")
+                return
+            }
+            
+            if granted {
+                print("Permission granted")
+            } else {
+                print("Permission not granted")
+            }
+        }
+    }
     
     func performAction(action: DesktopAction) {
         switch action {

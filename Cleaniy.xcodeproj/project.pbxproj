@@ -42,7 +42,7 @@
 		30A72DF62C4BA07500BE85B5 /* ContextMenuManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuManager.swift; sourceTree = "<group>"; };
 		30A72DF82C4BA0B800BE85B5 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		30A72DFA2C4BA1F400BE85B5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		30DC2E172C199F8800403EC3 /* Movelah.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Movelah.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		30DC2E172C199F8800403EC3 /* Cleaniy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cleaniy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30DC2E1A2C199F8800403EC3 /* MovelahApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovelahApp.swift; sourceTree = "<group>"; };
 		30DC2E1C2C199F8800403EC3 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		30DC2E1E2C199F8900403EC3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -50,9 +50,9 @@
 		30DC2E232C199F8900403EC3 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		30DC2E262C199F8900403EC3 /* Movelah.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Movelah.xcdatamodel; sourceTree = "<group>"; };
 		30DC2E282C199F8900403EC3 /* Movelah.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Movelah.entitlements; sourceTree = "<group>"; };
-		30DC2E2D2C199F8900403EC3 /* MovelahTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MovelahTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		30DC2E2D2C199F8900403EC3 /* CleaniyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleaniyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		30DC2E312C199F8900403EC3 /* MovelahTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovelahTests.swift; sourceTree = "<group>"; };
-		30DC2E372C199F8900403EC3 /* MovelahUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MovelahUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		30DC2E372C199F8900403EC3 /* CleaniyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleaniyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		30DC2E3B2C199F8900403EC3 /* MovelahUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovelahUITests.swift; sourceTree = "<group>"; };
 		30DC2E3D2C199F8900403EC3 /* MovelahUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovelahUITestsLaunchTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -95,9 +95,9 @@
 		30DC2E182C199F8800403EC3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				30DC2E172C199F8800403EC3 /* Movelah.app */,
-				30DC2E2D2C199F8900403EC3 /* MovelahTests.xctest */,
-				30DC2E372C199F8900403EC3 /* MovelahUITests.xctest */,
+				30DC2E172C199F8800403EC3 /* Cleaniy.app */,
+				30DC2E2D2C199F8900403EC3 /* CleaniyTests.xctest */,
+				30DC2E372C199F8900403EC3 /* CleaniyUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -147,9 +147,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		30DC2E162C199F8800403EC3 /* Movelah */ = {
+		30DC2E162C199F8800403EC3 /* Cleaniy */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 30DC2E412C199F8900403EC3 /* Build configuration list for PBXNativeTarget "Movelah" */;
+			buildConfigurationList = 30DC2E412C199F8900403EC3 /* Build configuration list for PBXNativeTarget "Cleaniy" */;
 			buildPhases = (
 				30DC2E132C199F8800403EC3 /* Sources */,
 				30DC2E142C199F8800403EC3 /* Frameworks */,
@@ -159,14 +159,14 @@
 			);
 			dependencies = (
 			);
-			name = Movelah;
+			name = Cleaniy;
 			productName = Movelah;
-			productReference = 30DC2E172C199F8800403EC3 /* Movelah.app */;
+			productReference = 30DC2E172C199F8800403EC3 /* Cleaniy.app */;
 			productType = "com.apple.product-type.application";
 		};
-		30DC2E2C2C199F8900403EC3 /* MovelahTests */ = {
+		30DC2E2C2C199F8900403EC3 /* CleaniyTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 30DC2E442C199F8900403EC3 /* Build configuration list for PBXNativeTarget "MovelahTests" */;
+			buildConfigurationList = 30DC2E442C199F8900403EC3 /* Build configuration list for PBXNativeTarget "CleaniyTests" */;
 			buildPhases = (
 				30DC2E292C199F8900403EC3 /* Sources */,
 				30DC2E2A2C199F8900403EC3 /* Frameworks */,
@@ -177,14 +177,14 @@
 			dependencies = (
 				30DC2E2F2C199F8900403EC3 /* PBXTargetDependency */,
 			);
-			name = MovelahTests;
+			name = CleaniyTests;
 			productName = MovelahTests;
-			productReference = 30DC2E2D2C199F8900403EC3 /* MovelahTests.xctest */;
+			productReference = 30DC2E2D2C199F8900403EC3 /* CleaniyTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		30DC2E362C199F8900403EC3 /* MovelahUITests */ = {
+		30DC2E362C199F8900403EC3 /* CleaniyUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 30DC2E472C199F8900403EC3 /* Build configuration list for PBXNativeTarget "MovelahUITests" */;
+			buildConfigurationList = 30DC2E472C199F8900403EC3 /* Build configuration list for PBXNativeTarget "CleaniyUITests" */;
 			buildPhases = (
 				30DC2E332C199F8900403EC3 /* Sources */,
 				30DC2E342C199F8900403EC3 /* Frameworks */,
@@ -195,9 +195,9 @@
 			dependencies = (
 				30DC2E392C199F8900403EC3 /* PBXTargetDependency */,
 			);
-			name = MovelahUITests;
+			name = CleaniyUITests;
 			productName = MovelahUITests;
-			productReference = 30DC2E372C199F8900403EC3 /* MovelahUITests.xctest */;
+			productReference = 30DC2E372C199F8900403EC3 /* CleaniyUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -223,7 +223,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 30DC2E122C199F8800403EC3 /* Build configuration list for PBXProject "Movelah" */;
+			buildConfigurationList = 30DC2E122C199F8800403EC3 /* Build configuration list for PBXProject "Cleaniy" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -236,9 +236,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				30DC2E162C199F8800403EC3 /* Movelah */,
-				30DC2E2C2C199F8900403EC3 /* MovelahTests */,
-				30DC2E362C199F8900403EC3 /* MovelahUITests */,
+				30DC2E162C199F8800403EC3 /* Cleaniy */,
+				30DC2E2C2C199F8900403EC3 /* CleaniyTests */,
+				30DC2E362C199F8900403EC3 /* CleaniyUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -306,12 +306,12 @@
 /* Begin PBXTargetDependency section */
 		30DC2E2F2C199F8900403EC3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 30DC2E162C199F8800403EC3 /* Movelah */;
+			target = 30DC2E162C199F8800403EC3 /* Cleaniy */;
 			targetProxy = 30DC2E2E2C199F8900403EC3 /* PBXContainerItemProxy */;
 		};
 		30DC2E392C199F8900403EC3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 30DC2E162C199F8800403EC3 /* Movelah */;
+			target = 30DC2E162C199F8800403EC3 /* Cleaniy */;
 			targetProxy = 30DC2E382C199F8900403EC3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -446,7 +446,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Movelah/Preview Content\"";
-				DEVELOPMENT_TEAM = APM9TAG6AS;
+				DEVELOPMENT_TEAM = 652LJ9UJFF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Cleanify;
@@ -475,7 +475,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Movelah/Preview Content\"";
-				DEVELOPMENT_TEAM = APM9TAG6AS;
+				DEVELOPMENT_TEAM = 652LJ9UJFF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Cleanify;
@@ -507,7 +507,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Movelah.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Movelah";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Cleaniy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Cleaniy";
 			};
 			name = Debug;
 		};
@@ -525,7 +525,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Movelah.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Movelah";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Cleaniy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Cleaniy";
 			};
 			name = Release;
 		};
@@ -564,7 +564,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		30DC2E122C199F8800403EC3 /* Build configuration list for PBXProject "Movelah" */ = {
+		30DC2E122C199F8800403EC3 /* Build configuration list for PBXProject "Cleaniy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				30DC2E3F2C199F8900403EC3 /* Debug */,
@@ -573,7 +573,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		30DC2E412C199F8900403EC3 /* Build configuration list for PBXNativeTarget "Movelah" */ = {
+		30DC2E412C199F8900403EC3 /* Build configuration list for PBXNativeTarget "Cleaniy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				30DC2E422C199F8900403EC3 /* Debug */,
@@ -582,7 +582,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		30DC2E442C199F8900403EC3 /* Build configuration list for PBXNativeTarget "MovelahTests" */ = {
+		30DC2E442C199F8900403EC3 /* Build configuration list for PBXNativeTarget "CleaniyTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				30DC2E452C199F8900403EC3 /* Debug */,
@@ -591,7 +591,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		30DC2E472C199F8900403EC3 /* Build configuration list for PBXNativeTarget "MovelahUITests" */ = {
+		30DC2E472C199F8900403EC3 /* Build configuration list for PBXNativeTarget "CleaniyUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				30DC2E482C199F8900403EC3 /* Debug */,

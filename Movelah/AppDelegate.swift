@@ -1,7 +1,8 @@
 import Cocoa
 import SwiftUI
+import UserNotifications
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     var window: NSWindow!
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -16,9 +17,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.setFrameAutosaveName("Main Window")
         window.contentView = NSHostingView(rootView: contentView)
         window.makeKeyAndOrderFront(nil)
+        
+        // Request notification permission
+        requestNotificationPermission()
+        
+       
     }
 
-    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+    func createDockMenu() -> NSMenu {
         let menu = NSMenu()
         
         let deleteMenuItem = NSMenuItem(title: "Delete", action: #selector(deleteAction), keyEquivalent: "")
@@ -40,5 +46,46 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func moveAction() {
         // Implement your move action
         print("Move action triggered from Dock menu")
+    }
+
+    func requestNotificationPermission() {
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("Error requesting notification permission: \(error.localizedDescription)")
+                return
+            }
+            
+            if granted {
+                print("Permission granted")
+                self.scheduleTestNotification()
+            } else {
+                print("Permission not granted")
+            }
+        }
+    }
+    
+    func scheduleTestNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "Cleaniy"
+        content.body = "Notification permission granted!"
+        content.sound = UNNotificationSound.default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error scheduling notification: \(error.localizedDescription)")
+            } else {
+                print("Test notification scheduled")
+            }
+        }
+    }
+    
+    // Handle notification settings changes
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([ .sound])
     }
 }
