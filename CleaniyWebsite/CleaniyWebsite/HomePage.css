@@ -1,0 +1,26 @@
+.logo {
+    height: auto;
+    width: auto;
+    max-height: 72px;
+    max-width: 250px;
+}
+.AboutUsImage{
+    height: auto;
+    width: auto;
+    max-height: 300px;
+    max-width: 300px;
+}
+.Banner{
+    padding: auto;
+    align-items: center;
+
+}
+.smallheader{
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.us{
+    align-self: center;
+    justify-content: center;
+    display: absolute;
+}
