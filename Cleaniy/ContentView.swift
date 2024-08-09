@@ -3,6 +3,16 @@ import Foundation
 import AppKit
 import UserNotifications
 
+// Entitlement Keys:
+// Entitlement Keys:
+// 1. com.apple.security.assets.movies.read-write: Allows the app to read and write to the user's Movies directory.
+// 2. com.apple.security.assets.music.read-write: Allows the app to read and write to the user's Music directory.
+// 3. com.apple.security.assets.pictures.read-write: Allows the app to read and write to the user's Pictures directory.
+// 4. com.apple.security.files.downloads.read-write: Allows the app to read and write to the user's Downloads directory.
+// 5. com.apple.security.files.user-selected.read-write: Allows the app to read and write to user-selected files and folders.I need this entitlement key because my app requires permission from users so that they can go to the desktop delete the screenshots and move the screenshots to their designated folder that they want.I need The actual entitlement key com.apple.security.files.user-selected.read-write.If I can't have it, please advise me on what entitlements I should substitute it with.
+// 6. App Sandbox: Enables sandboxing, restricting the app's access to system resources and user data for security purposes.
+
+
 struct ContentView: View {
     @State private var selectedOption: String = "Move"
     @State private var selectedFolder: String = "Documents" // Default folder
@@ -23,20 +33,6 @@ struct ContentView: View {
                 Spacer()
             }
             Divider()
-            // Uncomment this section for Advanced Settings
-            /*
-            VStack(spacing: 20) {
-                Button(action: {
-                    // Action for Advanced Settings button
-                }) {
-                    Text("Advanced Settings")
-                        .foregroundColor(.black)
-                        .padding(2.0)
-                        .background(Color.white)
-                        .cornerRadius(6)
-                }
-            }
-            */
             Divider()
             HStack {
                 Text("Move or delete the unassigned items on your desktop?")
@@ -132,54 +128,39 @@ struct ContentView: View {
         .background(MenuView()) // Attach the context menu here
     }
     
-    func handleAction(action: DesktopAction) {
+    func handleAction(action: DesktopAction, sourceDirectory: URL? = nil, destinationDirectory: URL? = nil) {
         if accessGranted {
-            performAction(action: action)
+            performAction(action: action, sourceDirectory: sourceDirectory, destinationDirectory: destinationDirectory)
         } else {
             requestDesktopAccess { granted in
                 if granted {
                     self.accessGranted = true
-                    performAction(action: action)
+                    performAction(action: action, sourceDirectory: sourceDirectory, destinationDirectory: destinationDirectory)
                 }
             }
         }
     }
-    func requestNotificationPermission() {
-        let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if let error = error {
-                print("Error requesting notification permission: \(error.localizedDescription)")
-                return
-            }
-            
-            if granted {
-                print("Permission granted")
-            } else {
-                print("Permission not granted")
-            }
-        }
-    }
     
-    func performAction(action: DesktopAction) {
+    func performAction(action: DesktopAction, sourceDirectory: URL? = nil, destinationDirectory: URL? = nil) {
         switch action {
         case .move:
-            moveItemsToFolder(folder: selectedFolder)
+            moveItemsToFolder(folder: selectedFolder, sourceDirectory: sourceDirectory, destinationDirectory: destinationDirectory)
             sendNotification(message: "Cleaniy has moved your items yay!")
         case .delete:
-            deleteItemsOnDesktop()
+            deleteItemsOnDesktop(sourceDirectory: sourceDirectory)
             sendNotification(message: "Cleaniy has cleaned your desktop yay!")
         }
         self.presentationMode.wrappedValue.dismiss() // Dismiss view after action
     }
     
-    func moveItemsToFolder(folder: String) {
-        let desktopPath = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
-        let destinationFolder = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(folder)
+    func moveItemsToFolder(folder: String, sourceDirectory: URL? = nil, destinationDirectory: URL? = nil) {
+        let sourceDir = sourceDirectory ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
+        let destinationDir = destinationDirectory ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(folder)
         
         // Ensure the destination folder exists
-        if !FileManager.default.fileExists(atPath: destinationFolder.path) {
+        if !FileManager.default.fileExists(atPath: destinationDir.path) {
             do {
-                try FileManager.default.createDirectory(at: destinationFolder, withIntermediateDirectories: true, attributes: nil)
+                try FileManager.default.createDirectory(at: destinationDir, withIntermediateDirectories: true, attributes: nil)
             } catch {
                 print("Error creating destination folder: \(error)")
                 return
@@ -187,13 +168,13 @@ struct ContentView: View {
         }
         
         do {
-            // Get a list of all files on the desktop
-            let filesOnDesktop = try FileManager.default.contentsOfDirectory(atPath: desktopPath.path)
+            // Get a list of all files in the source directory
+            let filesInSourceDir = try FileManager.default.contentsOfDirectory(atPath: sourceDir.path)
             
             // Iterate through the files and move them to the destination folder
-            for file in filesOnDesktop {
-                let src = desktopPath.appendingPathComponent(file)
-                let dst = destinationFolder.appendingPathComponent(file)
+            for file in filesInSourceDir {
+                let src = sourceDir.appendingPathComponent(file)
+                let dst = destinationDir.appendingPathComponent(file)
                 
                 do {
                     // Check if the file is a directory
@@ -203,16 +184,39 @@ struct ContentView: View {
                     if !isDirectory.boolValue {
                         // Move the file if it's not a directory
                         try FileManager.default.moveItem(at: src, to: dst)
-                        print("Moved \(file) to \(destinationFolder.path).")
+                        print("Moved \(file) to \(destinationDir.path).")
                     }
                 } catch {
                     print("Error moving file \(file): \(error)")
                 }
             }
         } catch {
-            print("Error reading contents of desktop: \(error)")
+            print("Error reading contents of source directory: \(error)")
         }
     }
+    
+    func deleteItemsOnDesktop(sourceDirectory: URL? = nil) {
+        let sourceDir = sourceDirectory ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
+        
+        do {
+            // Get a list of all files in the source directory
+            let filesInSourceDir = try FileManager.default.contentsOfDirectory(atPath: sourceDir.path)
+            
+            // Iterate through the files and delete them
+            for file in filesInSourceDir {
+                let filePath = sourceDir.appendingPathComponent(file)
+                do {
+                    try FileManager.default.removeItem(at: filePath)
+                    print("Deleted \(file) from directory.")
+                } catch {
+                    print("Error deleting file \(file): \(error)")
+                }
+            }
+        } catch {
+            print("Error reading contents of directory: \(error)")
+        }
+    }
+
     
     func requestDesktopAccess(completion: @escaping (Bool) -> Void) {
         let openPanel = NSOpenPanel()
@@ -250,64 +254,40 @@ struct ContentView: View {
         }
     }
     
-    func deleteItemsOnDesktop() {
-        let desktopPath = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
-        
-        do {
-            // Get a list of all files on the desktop
-            let filesOnDesktop = try FileManager.default.contentsOfDirectory(atPath: desktopPath.path)
-            
-            // Iterate through the files and delete screenshots from the desktop
-            for file in filesOnDesktop {
-                if file.hasPrefix("Screenshot") || file.hasPrefix("Screen Shot") {
-                    let filePath = desktopPath.appendingPathComponent(file)
-                    do {
-                        try FileManager.default.removeItem(at: filePath)
-                        print("Deleted \(file) from desktop.")
-                    } catch {
-                        print("Error deleting file \(file): \(error)")
-                    }
-                }
-            }
-        } catch {
-            print("Error reading contents of desktop: \(error)")
-        }
-    }
-    
     func sendNotification(message: String) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-                if let error = error {
-                    print("Error requesting notification permission: \(error.localizedDescription)")
-                    return
-                }
-                
-                if granted {
-                    print("Permission granted")
-                    
-                    // Create the notification content
-                    let notification = UNMutableNotificationContent()
-                    notification.title = "Cleaniy"
-                    notification.body = message
-                    notification.sound = UNNotificationSound.default
-                    
-                    // Create a trigger to fire the notification after 2 seconds
-                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
-                    
-                    // Create the notification request
-                    let request = UNNotificationRequest(identifier: UUID().uuidString, content: notification, trigger: trigger)
-                    
-                    // Add the notification request to the notification center
-                    UNUserNotificationCenter.current().add(request) { error in
-                        if let error = error {
-                            print("Error adding notification: \(error.localizedDescription)")
-                        } else {
-                            print("Notification scheduled: \(message)")
-                        }
-                    }
-                } else {
-                    print("Permission not granted")
-                }
+            if let error = error {
+                print("Error requesting notification permission: \(error.localizedDescription)")
+                return
             }
+            
+            if granted {
+                print("Permission granted")
+                
+                // Create the notification content
+                let notification = UNMutableNotificationContent()
+                notification.title = "Cleaniy"
+                notification.body = message
+                notification.sound = UNNotificationSound.default
+                
+                // Create a trigger to fire the notification after 2 seconds
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
+                
+                // Create the notification request
+                let request = UNNotificationRequest(identifier: UUID().uuidString, content: notification, trigger: trigger)
+                
+                // Add the notification request to the notification center
+                UNUserNotificationCenter.current().add(request) { error in
+                    if let error = error {
+                        print("Error adding notification: \(error.localizedDescription)")
+                    } else {
+                        print("Notification scheduled: \(message)")
+                    }
+                }
+            } else {
+                print("Permission not granted")
+            }
+        }
     }
     
     enum DesktopAction {

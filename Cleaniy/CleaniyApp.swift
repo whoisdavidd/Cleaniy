@@ -10,7 +10,7 @@ import Foundation
 
 
 @main
-struct MovelahApp: App {
+struct Cleaniy: App {
     let persistenceController = PersistenceController.shared
     
     var body: some Scene {

@@ -1,6 +1,6 @@
 //
 //  Persistence.swift
-//  Movelah
+//  Cleaniy
 //
 //  Created by David Kumar on 12/6/24.
 //
@@ -31,7 +31,7 @@ struct PersistenceController {
     let container: NSPersistentContainer
 
     init(inMemory: Bool = false) {
-        container = NSPersistentContainer(name: "Movelah")
+        container = NSPersistentContainer(name: "Cleaniy")
         if inMemory {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
