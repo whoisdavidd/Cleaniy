@@ -3,22 +3,16 @@ import Foundation
 import AppKit
 import UserNotifications
 
-// Entitlement Keys:
-// Entitlement Keys:
-// 1. com.apple.security.assets.movies.read-write: Allows the app to read and write to the user's Movies directory.
-// 2. com.apple.security.assets.music.read-write: Allows the app to read and write to the user's Music directory.
-// 3. com.apple.security.assets.pictures.read-write: Allows the app to read and write to the user's Pictures directory.
-// 4. com.apple.security.files.downloads.read-write: Allows the app to read and write to the user's Downloads directory.
-// 5. com.apple.security.files.user-selected.read-write: Allows the app to read and write to user-selected files and folders.I need this entitlement key because my app requires permission from users so that they can go to the desktop delete the screenshots and move the screenshots to their designated folder that they want.I need The actual entitlement key com.apple.security.files.user-selected.read-write.If I can't have it, please advise me on what entitlements I should substitute it with.
-// 6. App Sandbox: Enables sandboxing, restricting the app's access to system resources and user data for security purposes.
+
 
 
 struct ContentView: View {
     @State private var selectedOption: String = "Move"
+    @State private var directoryURL: URL?
     @State private var selectedFolder: String = "Documents" // Default folder
     @State private var securityScopedURLs: [URL] = []
     @State private var accessGranted: Bool = false // Track access granted status
-    let availableFolders = ["Documents", "Downloads", "Pictures", "Music", "Movies"] // Predefined folders
+    @State private var availableFolders: [String] = []
     @Environment(\.presentationMode) var presentationMode // Environment property to manage presentation mode
     
     var body: some View {
@@ -107,27 +101,86 @@ struct ContentView: View {
                 .padding(.vertical, 20)
             }
         }
+        Button("Allow Desktop Access") {
+            requestDesktopAccess { granted in
+                if granted {
+                    print("Access granted")
+                    loadAvailableFolders()
+                    accessGranted = true
+                } else {
+                    print("Access denied")
+                }
+            }
+        }
         .onAppear {
-            // Check if access is already granted using UserDefaults
-            if UserDefaults.standard.bool(forKey: "DesktopAccessGranted"), let bookmarkData = UserDefaults.standard.data(forKey: "DesktopBookmark") {
-                do {
-                    var isStale = false
-                    let securityScopedURL = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale)
-                    
-                    if !isStale {
-                        _ = securityScopedURL.startAccessingSecurityScopedResource()
-                        self.securityScopedURLs.append(securityScopedURL)
-                        self.accessGranted = true
+            if let bookmarkData = UserDefaults.standard.data(forKey: "DesktopBookmark") {
+                // If access is already granted, resolve the bookmark
+                resolveBookmark(bookmarkData)
+                accessGranted = true
+            } else {
+                // If access is not granted, request it
+                requestDesktopAccess { granted in
+                    if granted, let bookmarkData = UserDefaults.standard.data(forKey: "DesktopBookmark") {
+                        resolveBookmark(bookmarkData)
+                        accessGranted = true
+                    } else {
+                        print("Access not granted")
                     }
-                } catch {
-                    print("Error resolving bookmark data: \(error.localizedDescription)")
                 }
             }
         }
         .padding()
         .background(MenuView()) // Attach the context menu here
     }
+    func resolveBookmark(_ bookmarkData: Data) {
+        do {
+            var isStale = false
+            let securityScopedURL = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale)
+            
+            if !isStale, securityScopedURL.startAccessingSecurityScopedResource() {
+                defer { securityScopedURL.stopAccessingSecurityScopedResource() }
+                var isDirectory: ObjCBool = false
+                if FileManager.default.fileExists(atPath: securityScopedURL.path, isDirectory: &isDirectory), isDirectory.boolValue {
+                    self.securityScopedURLs.append(securityScopedURL)
+                    self.accessGranted = true
+                    loadAvailableFolders() // Only load folders once access is confirmed
+                } else {
+                    print("Resolved URL is not a directory.")
+                }
+            } else {
+                print("Failed to access security-scoped resource or bookmark is stale.")
+            }
+        } catch {
+            print("Error resolving bookmark data: \(error.localizedDescription)")
+        }
+    }
+
     
+    func loadAvailableFolders() {
+        guard let directoryURL = directoryURL else {
+            print("Directory URL not set.")
+            return
+        }
+
+        do {
+            // Get a list of all items in the provided directory (Desktop)
+            let items = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            
+            // Filter out items that are directories
+            let folders = items.filter { $0.hasDirectoryPath }.map { $0.lastPathComponent }
+            
+            // Update the available folders state
+            self.availableFolders = folders
+            
+            // Automatically select the first folder, if any
+            if let firstFolder = folders.first {
+                self.selectedFolder = firstFolder
+            }
+        } catch {
+            print("Error loading folders on desktop: \(error)")
+        }
+    }
+
     func handleAction(action: DesktopAction, sourceDirectory: URL? = nil, destinationDirectory: URL? = nil) {
         if accessGranted {
             performAction(action: action, sourceDirectory: sourceDirectory, destinationDirectory: destinationDirectory)
@@ -154,46 +207,46 @@ struct ContentView: View {
     }
     
     func moveItemsToFolder(folder: String, sourceDirectory: URL? = nil, destinationDirectory: URL? = nil) {
-        let sourceDir = sourceDirectory ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
-        let destinationDir = destinationDirectory ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(folder)
-        
-        // Ensure the destination folder exists
-        if !FileManager.default.fileExists(atPath: destinationDir.path) {
-            do {
-                try FileManager.default.createDirectory(at: destinationDir, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                print("Error creating destination folder: \(error)")
-                return
-            }
-        }
-        
-        do {
-            // Get a list of all files in the source directory
-            let filesInSourceDir = try FileManager.default.contentsOfDirectory(atPath: sourceDir.path)
+            let sourceDir = sourceDirectory ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
+            let destinationDir = destinationDirectory ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(folder)
             
-            // Iterate through the files and move them to the destination folder
-            for file in filesInSourceDir {
-                let src = sourceDir.appendingPathComponent(file)
-                let dst = destinationDir.appendingPathComponent(file)
-                
+            // Ensure the destination folder exists
+            if !FileManager.default.fileExists(atPath: destinationDir.path) {
                 do {
-                    // Check if the file is a directory
-                    var isDirectory: ObjCBool = false
-                    FileManager.default.fileExists(atPath: src.path, isDirectory: &isDirectory)
-                    
-                    if !isDirectory.boolValue {
-                        // Move the file if it's not a directory
-                        try FileManager.default.moveItem(at: src, to: dst)
-                        print("Moved \(file) to \(destinationDir.path).")
-                    }
+                    try FileManager.default.createDirectory(at: destinationDir, withIntermediateDirectories: true, attributes: nil)
                 } catch {
-                    print("Error moving file \(file): \(error)")
+                    print("Error creating destination folder: \(error)")
+                    return
                 }
             }
-        } catch {
-            print("Error reading contents of source directory: \(error)")
+            
+            do {
+                // Get a list of all files in the source directory
+                let filesInSourceDir = try FileManager.default.contentsOfDirectory(atPath: sourceDir.path)
+                
+                // Iterate through the files and move them to the destination folder
+                for file in filesInSourceDir {
+                    let src = sourceDir.appendingPathComponent(file)
+                    let dst = destinationDir.appendingPathComponent(file)
+                    
+                    do {
+                        // Check if the file is a directory
+                        var isDirectory: ObjCBool = false
+                        FileManager.default.fileExists(atPath: src.path, isDirectory: &isDirectory)
+                        
+                        if !isDirectory.boolValue {
+                            // Move the file if it's not a directory
+                            try FileManager.default.moveItem(at: src, to: dst)
+                            print("Moved \(file) to \(destinationDir.path).")
+                        }
+                    } catch {
+                        print("Error moving file \(file): \(error)")
+                    }
+                }
+            } catch {
+                print("Error reading contents of source directory: \(error)")
+            }
         }
-    }
     
     func deleteItemsOnDesktop(sourceDirectory: URL? = nil) {
         let sourceDir = sourceDirectory ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
@@ -202,58 +255,62 @@ struct ContentView: View {
             // Get a list of all files in the source directory
             let filesInSourceDir = try FileManager.default.contentsOfDirectory(atPath: sourceDir.path)
             
-            // Iterate through the files and delete them
+            // Iterate through the files and delete only the screenshots
             for file in filesInSourceDir {
                 let filePath = sourceDir.appendingPathComponent(file)
-                do {
-                    try FileManager.default.removeItem(at: filePath)
-                    print("Deleted \(file) from directory.")
-                } catch {
-                    print("Error deleting file \(file): \(error)")
-                }
+                
+                // Check if the file name matches the screenshot naming convention
+                if file.lowercased().hasPrefix("screen shot") {
+                            var moved = false
+                                do {
+                                    try NSWorkspace.shared.recycle([filePath])
+                                    moved = true
+                                } catch {
+                                    print("Error moving screenshot \(file) to Trash: \(error)")
+                                }
+                                
+                                if moved {
+                                    print("Moved screenshot \(file) to Trash.")
+                                } else {
+                                    print("Failed to move screenshot \(file) to Trash.")
+                                }
+                            }
             }
         } catch {
             print("Error reading contents of directory: \(error)")
         }
     }
 
-    
     func requestDesktopAccess(completion: @escaping (Bool) -> Void) {
-        let openPanel = NSOpenPanel()
-        openPanel.message = "Please grant access to the Desktop directory."
-        openPanel.directoryURL = URL(fileURLWithPath: NSHomeDirectory() + "/Desktop")
-        openPanel.canChooseDirectories = true
-        openPanel.canChooseFiles = false
-        openPanel.allowsMultipleSelection = false
-        openPanel.prompt = "Grant Access"
-        
-        openPanel.begin { response in
-            if response == .OK, let url = openPanel.url {
-                do {
-                    let bookmark = try url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
-                    var isStale = false
-                    let securityScopedURL = try URL(resolvingBookmarkData: bookmark, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale)
-                    
-                    if !isStale {
-                        _ = securityScopedURL.startAccessingSecurityScopedResource()
-                        self.securityScopedURLs.append(securityScopedURL)
-                        UserDefaults.standard.set(true, forKey: "DesktopAccessGranted") // Save access status
-                        UserDefaults.standard.set(bookmark, forKey: "DesktopBookmark") // Save bookmark
+        DispatchQueue.main.async {
+            let openPanel = NSOpenPanel()
+            openPanel.message = "Please grant access to the Desktop directory."
+            openPanel.directoryURL = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first
+            openPanel.canChooseDirectories = true
+            openPanel.canChooseFiles = false
+            openPanel.allowsMultipleSelection = false
+            openPanel.prompt = "Grant Access"
+            
+            openPanel.begin { response in
+                if response == .OK, let url = openPanel.url {
+                    do {
+                        let bookmark = try url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
+                        UserDefaults.standard.set(bookmark, forKey: "DesktopBookmark")
+                        _ = url.startAccessingSecurityScopedResource()
+                        
+                        self.directoryURL = url // Store the URL here
                         completion(true)
-                    } else {
-                        print("Bookmark data is stale")
+                    } catch {
+                        print("Error creating bookmark: \(error.localizedDescription)")
                         completion(false)
                     }
-                } catch {
-                    print("Error creating bookmark or resolving URL: \(error.localizedDescription)")
+                } else {
                     completion(false)
                 }
-            } else {
-                completion(false)
             }
         }
     }
-    
+
     func sendNotification(message: String) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if let error = error {
